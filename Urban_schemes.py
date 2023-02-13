@@ -46,16 +46,24 @@ elif domain == 3:
     CAMS35_pos=([55],[80])
     CAMS695_pos=([59],[63])
     CAMS416_pos=([56],[67])
+    CAMS53_pos= ([57],[51])
+    CAMS169_pos=([58],[70])
+    CAMS1052_pos=([68],[60])
 
-measuring_stations=[CAMS1_pos,CAMS55_pos,CAMS35_pos,CAMS695_pos,CAMS416_pos]
+measuring_stations=[CAMS1_pos,CAMS55_pos,CAMS35_pos,CAMS695_pos,CAMS416_pos,CAMS53_pos,CAMS169_pos,CAMS1052_pos]
 
 stations_dict={}
-keys_for_dict = ['CAMS1','CAMS55','CAMS35','CAMS695','CAMS416']
+keys_for_dict = ['CAMS1','CAMS55','CAMS35','CAMS695','CAMS416','CAMS53','CAMS169','CAMS1052']
 stations_dict['CAMS1']=[]
 stations_dict['CAMS55']=[]
 stations_dict['CAMS35']=[]
 stations_dict['CAMS695']=[]
 stations_dict['CAMS416']=[]
+stations_dict['CAMS53']=[]
+stations_dict['CAMS169']=[]
+stations_dict['CAMS1052']=[]
+
+
 time_idx=0
 
 
@@ -71,7 +79,7 @@ urban='BEM'
 
 Input_Dir='/project/momen/Lmatak/WRF_CHEM/URBAN_SCHEME_RUNS/simulation_runs/'
 
-dir_names=['cd_3.0','cd_4.0' ]#,'WRF_BEM_change_momentum_1.5','WRF_BEM_change_tke_0.5','WRF_BEM_change_tke_1.5','WRF_BEM_change_momentum_0.5']
+dir_names=['cd_0.5']#,'cd_4.0' ]#,'WRF_BEM_change_momentum_1.5','WRF_BEM_change_tke_0.5','WRF_BEM_change_tke_1.5','WRF_BEM_change_momentum_0.5']
 months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 #at what altitude?
 alt=50
@@ -88,6 +96,9 @@ for dir_name in dir_names:
         stations_dict['CAMS35']=[]
         stations_dict['CAMS695']=[]
         stations_dict['CAMS416']=[]
+        stations_dict['CAMS53']=[]
+        stations_dict['CAMS169']=[]
+        stations_dict['CAMS1052']=[]
 
 
             ## UNCOMMENT FOR DEFAULT  ##
@@ -160,7 +171,16 @@ for dir_name in dir_names:
                     #print('measure stat',measur_station)
                     #print('---------')
                     wspd=math.sqrt(u10[measur_station]**2+v10[measur_station]**2)
-
+                    print('at surface wspd is ',float(wspd))
+                    if measur_station==([58],[70]):
+                        #height=height[1]
+                        height2=interplevel(height,height,20)
+                        print(height2)
+                        wspd=getvar(data, "wspd",time_idx)
+                        wspd= interplevel(wspd, height, 20)
+                        wspd=wspd[measur_station]
+                        print('now doing stationn 169, wspd is:',float(wspd))
+                        #print('and height for that shit is, ',float(height2))
 
                     wspd_per_file.append(2.23693629*float(wspd))
                     surface_temperature_per_file.append(float(outdoor_temperature[measur_station]*9/5-459.67))
@@ -185,7 +205,9 @@ for dir_name in dir_names:
         ##write the var name, top left corner
         MyFile.write ("Urban_schemes_"+str(domain)+ "\n")
         # MyFile.write ("Temperature,PM2_5,NO,NO2,WSPD\n")
-        MyFile.write ("Temperature,CAMS1_WSPD,CAMS55_WSPD,CAMS35_WSPD,CAMS695_WSPD,CAMS416_WSPD,ALL_CAMS_AVG\n")
+
+        MyFile.write ("Temperature,CAMS1_WSPD,CAMS55_WSPD,CAMS35_WSPD,CAMS695_WSPD,CAMS416_WSPD, \\\
+                    CAMS53_WSPD,CAMS169_WSPD,CAMS1052_WSPD,ALL_CAMS_AVG\n")
         ##write longitudes in first row
         for hour in range(len(ncfiles)-1):
 
@@ -196,6 +218,9 @@ for dir_name in dir_names:
                 MyFile.write(str(stations_dict['CAMS35'][hour])+",")
                 MyFile.write(str(stations_dict['CAMS695'][hour])+",")
                 MyFile.write(str(stations_dict['CAMS416'][hour])+",")
+                MyFile.write(str(stations_dict['CAMS53'][hour])+",")
+                MyFile.write(str(stations_dict['CAMS169'][hour])+",")
+                MyFile.write(str(stations_dict['CAMS1052'][hour])+",")
                 # MyFile.write(str(NO_list[hour])+",")
                 # MyFile.write(str(NO2_list[hour])+",")
                 MyFile.write(str(WSPD_list[hour])+"\n")
